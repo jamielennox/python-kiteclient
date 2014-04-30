@@ -27,9 +27,8 @@ class Group(resource.Resource):
     base_path = 'groups'
     id_key = 'name'
 
-    def __init__(self, name, loaded=False):
+    def __init__(self, loaded=False):
         super(Group, self).__init__(loaded=loaded)
-        self.name = name
         self.key_data = {}
 
     @classmethod

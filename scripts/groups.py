@@ -32,6 +32,5 @@ src_key = base64.b64decode(src.key)
 group = v1.Group(me.split('.')[0])
 group.create(s)
 
-key_data = group.get_key(s, me, src_key)
-
-import ipdb; ipdb.set_trace()
+key_data = group.get_key(s, me, src_key, generation=2)
+print base64.b64encode(key_data)
