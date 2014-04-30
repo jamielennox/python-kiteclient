@@ -34,3 +34,5 @@ group.create(s)
 
 key_data = group.get_key(s, me, src_key, generation=2)
 print base64.b64encode(key_data)
+
+import ipdb; ipdb.set_trace()
