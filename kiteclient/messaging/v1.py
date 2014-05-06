@@ -35,10 +35,10 @@ class KiteRPC(protocol.OpenStackRPC2):
         self.register_conf_opts(conf)
 
         self.session = session.Session()
-        self.session.auth = token_endpoint.Token(conf.url, None)
-        self.sender = conf.sender
+        self.session.auth = token_endpoint.Token(conf.kds_url, None)
+        self.sender = conf.kds_sender
 
-        self.key = base64.b64decode(conf.key)
+        self.key = base64.b64decode(conf.kds_key)
 
     @staticmethod
     def register_conf_opts(conf):
