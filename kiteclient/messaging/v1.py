@@ -10,8 +10,16 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+import base64
+
+from keystoneclient import session
+from keystoneclient.auth import token_endpoint
 from oslo.config import cfg
 from oslo.messaging.rpc import protocol
+
+from kiteclient.openstack.common import jsonutils
+from kiteclient.v1 import ticket
+
 
 _kds_messaging_opts = [
     cfg.StrOpt('url', help='The URL of the Key Distribution Server'),
@@ -26,15 +34,41 @@ class KiteRPC(protocol.OpenStackRPC2):
         super(KiteRPC, self).__init__(conf)
         self.register_conf_opts(conf)
 
+        self.session = session.Session()
+        self.session.auth = token_endpoint.Token(conf.url, None)
+        self.sender = conf.sender
+
+        self.key = base64.b64decode(conf.key)
+
     @staticmethod
     def register_conf_otps(conf):
         conf.register_opts(_kds_messaging_opts)
 
-    def serialize_msg(self, msg):
-        return super(KiteRPC, self).serialize_msg(msg)
+    def serialize_msg(self, target, msg):
+        tick = ticket.Ticket.create(self.session,
+                                    self.sender,
+                                    target,
+                                    self.key)
+
+        data = super(KiteRPC, self).serialize_msg(msg)
+        json_data = jsonutils.dumps(data)
+
+        enc, sig = tick.encode(json_data)
+
+        return {'data': enc,
+                'signature': sig,
+                'source': self.sender,
+                'destination': target,
+                'esek': ticket.b64_esek}
 
     def deserialize_msg(self, msg):
-        return super(KiteRPC, self).deserialize_msg(msg)
+        assert msg['destination'] == self.sender
+
+        esek = ticket.Esek(self.key, msg['esek'], msg['source'], self.sender)
+        esek.verify()
+
+        data = esek.decode(msg['data'], msg['signature'])
+        return super(KiteRPC, self).deserialize_msg(data)
 
     def serialize_exception(self, failure_info, log_failure=True):
         return super(KiteRPC, self).serialize_exception(failure_info,
