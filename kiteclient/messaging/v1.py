@@ -12,8 +12,8 @@
 
 import base64
 
-from keystoneclient import session
 from keystoneclient.auth import token_endpoint
+from keystoneclient import session
 from oslo.config import cfg
 from oslo.messaging.rpc import protocol
 
@@ -41,7 +41,7 @@ class KiteRPC(protocol.OpenStackRPC2):
         self.key = base64.b64decode(conf.key)
 
     @staticmethod
-    def register_conf_otps(conf):
+    def register_conf_opts(conf):
         conf.register_opts(_kds_messaging_opts)
 
     def serialize_msg(self, target, msg):
