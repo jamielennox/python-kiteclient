@@ -22,9 +22,9 @@ from kiteclient.v1 import ticket
 
 
 _kds_messaging_opts = [
-    cfg.StrOpt('url', help='The URL of the Key Distribution Server'),
-    cfg.StrOpt('sender', help='The name of this node for RPC'),
-    cfg.StrOpt('key', help='The Base64 encode long term key'),
+    cfg.StrOpt('kds_url', help='The URL of the Key Distribution Server'),
+    cfg.StrOpt('kds_sender', help='The name of this node for RPC'),
+    cfg.StrOpt('kds_key', help='The Base64 encode long term key'),
 ]
 
 
