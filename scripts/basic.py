@@ -24,7 +24,7 @@ message = 'MESSAGE'
 auth = token_endpoint.Token('http://localhost:9109/v1', 'aToken')
 s = session.Session(auth=auth)
 
-srckey = v1.Key.generate('testkey', session=s)
+srckey = v1.Key.generate('group1.testkey', session=s)
 print("source", srckey)
 
 dstkey = v1.Key.generate('destkey', session=s)
@@ -41,3 +41,8 @@ new_message = esek.decrypt(enc, sig, b64decode=True)
 assert message == new_message
 
 print(new_message)
+
+g = v1.Group('group1', srckey, session=s)
+gkey = g.get_key(s, srckey)
+
+print gkey
